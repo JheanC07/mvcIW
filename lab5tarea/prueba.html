@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>LocalJobs Connect - Connecting Local Workers with Contractors</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <style id="app-style">
+      body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #f8fafc;
+      }
+      
+      .hero {
+        background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://cdn.pixabay.com/photo/2018/03/10/12/00/teamwork-3213924_1280.jpg');
+        background-size: cover;
+        background-position: center;
+      }
+      
+      .registration-form {
+        max-width: 500px;
+      }
+      
+      .step-indicator {
+        display: flex;
+        margin-bottom: 1rem;
+      }
+      
+      .step {
+        flex: 1;
+        padding: 10px;
+        text-align: center;
+        background-color: #e5e7eb;
+        color: #6b7280;
+        position: relative;
+      }
+      
+      .step.active {
+        background-color: #3b82f6;
+        color: white;
+      }
+      
+      .step.completed {
+        background-color: #10b981;
+        color: white;
+      }
+      
+      .category-card {
+        transition: transform 0.3s ease;
+      }
+      
+      .category-card:hover:not(.pending) {
+        transform: translateY(-5px);
+      }
+      
+      .pending {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+      
+      .rating {
+        color: #fbbf24;
+      }
+      
+      .nav-link {
+        position: relative;
+      }
+      
+      .nav-link::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background-color: #3b82f6;
+        transition: width 0.3s;
+      }
+      
+      .nav-link:hover::after {
+        width: 100%;
+      }
+      
+      .tooltip {
+        position: relative;
+        display: inline-block;
+      }
+      
+      .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 200px;
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        transform: translateX(-50%);
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      
+      .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+      <nav class="container mx-auto px-4 py-3 flex justify-between items-center">
+        <a href="javascript:void(0)" class="text-2xl font-bold text-blue-600">
+          <i class="fas fa-handshake mr-2"></i>LocalJobs Connect
+        </a>
+        <div class="hidden md:flex space-x-6">
+          <a href="javascript:void(0)" class="nav-link py-2 text-gray-700 hover:text-blue-600">How It Works</a>
+          <a href="javascript:void(0)" class="nav-link py-2 text-gray-700 hover:text-blue-600">Categorias</a>
+          <a href="javascript:void(0)" class="nav-link py-2 text-gray-700 hover:text-blue-600">Pricing</a>
+          <a href="javascript:void(0)" class="nav-link py-2 text-gray-700 hover:text-blue-600">About Us</a>
+        </div>
+        <div>
+          <button id="login-btn" class="py-2 px-4 text-blue-600 font-medium hover:text-blue-700 mr-2">Ingresar</button>
+          <button id="register-btn" class="py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">Registrar</button>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+      <!-- Hero Section -->
+      <section id="hero" class="hero h-[500px] flex items-center justify-center">
+        <div class="text-center text-white px-4">
+          <h1 class="text-4xl md:text-5xl font-bold mb-4">Conecta con un local de talentos y oportunidades</h1>
+          <p class="text-xl mb-8">Find skilled workers or get hired for local micro-jobs in your area</p>
+          <div class="flex flex-col sm:flex-row justify-center gap-4">
+            <button id="contractor-btn" class="py-3 px-8 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition text-lg">I'm a Contractor</button>
+            <button id="worker-btn" class="py-3 px-8 bg-white text-blue-600 rounded-md hover:bg-gray-100 transition text-lg">I'm a Worker</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- How It Works Section -->
+      <section id="how-it-works" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+          <h2 class="text-3xl font-bold text-center mb-12">How It Works</h2>
+          
+          <div class="grid md:grid-cols-3 gap-8">
+            <div class="bg-gray-50 p-6 rounded-lg shadow-sm text-center">
+              <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-user-plus text-blue-600 text-2xl"></i>
+              </div>
+              <h3 class="text-xl font-semibold mb-3">1. Crea un Cuenta</h3>
+              <p class="text-gray-600">Register as a contractor looking for help or as a worker offering your skills.</p>
+            </div>
+            
+            <div class="bg-gray-50 p-6 rounded-lg shadow-sm text-center">
+              <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-clipboard-list text-blue-600 text-2xl"></i>
+              </div>
+              <h3 class="text-xl font-semibold mb-3">2. Completa tu perfil</h3>
+              <p class="text-gray-600">Upload required documents and showcase your expertise or post job requirements.</p>
+            </div>
+            
+            <div class="bg-gray-50 p-6 rounded-lg shadow-sm text-center">
+              <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-handshake text-blue-600 text-2xl"></i>
+              </div>
+              <h3 class="text-xl font-semibold mb-3">3. Connecta y trabaja</h3>
+              <p class="text-gray-600">Find the perfect match, communicate, complete jobs, and leave reviews.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- User Registration Section -->
+      <section id="registration" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+          <h2 class="text-3xl font-bold text-center mb-12">User Registration & Application Process</h2>
+          
+          <div class="grid md:grid-cols-2 gap-12">
+            <div class="bg-white p-6 rounded-lg shadow-sm">
+              <h3 class="text-xl font-semibold mb-4 flex items-center">
+                <i class="fas fa-building text-blue-600 mr-2"></i>
+                For Contractors
+              </h3>
+              <ul class="space-y-3">
+                <li class="flex items-start">
+                  <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                  <span>Fill out a simple registration form with your basic information</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                  <span>Verify your email address to activate your account</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                  <span>Create a company profile (optional for enhanced visibility)</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                  <span>Browse worker categories and post jobs immediately</span>
+                </li>
+              </ul>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow-sm">
+              <h3 class="text-xl font-semibold mb-4 flex items-center">
+                <i class="fas fa-hard-hat text-blue-600 mr-2"></i>
+                For Workers
+              </h3>
+              <ul class="space-y-3">
+                <li class="flex items-start">
+                  <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                  <span>Register with your basic information and verify your email</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                  <span>Submit required documentation: government-issued ID, proof of address</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                  <span>Provide evidence of qualifications or portfolio of previous work</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                  <span>Pay registration fee and wait for application approval</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Payment Structure Section -->
+      <section id="payment" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+          <h2 class="text-3xl font-bold text-center mb-12">Payment Structure</h2>
+          
+          <div class="grid md:grid-cols-3 gap-8">
+            <div class="bg-gray-50 p-6 rounded-lg shadow-sm border-t-4 border-blue-600">
+              <div class="text-center mb-6">
+                <h3 class="text-xl font-semibold">Worker Registration</h3>
+                <p class="text-gray-500 text-sm">One-time fee</p>
+                <div class="text-3xl font-bold text-blue-600 mt-4">$49.99</div>
+              </div>
+              <ul class="space-y-3 mb-8">
+                <li class="flex items-start">
+                  <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                  <span>Account creation and profile setup</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                  <span>Document verification process</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                  <span>Background check</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                  <span>Initial category placement</span>
+                </li>
+              </ul>
+              <button class="w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">Pay Registration Fee</button>
+            </div>
+            
+            <div class="bg-gray-50 p-6 rounded-lg shadow-sm border-t-4 border-blue-600 transform scale-105">
+              <div class="bg-blue-600 text-white py-1 px-3 rounded-full text-xs font-semibold inline-block absolute -mt-9">POPULAR</div>
+              <div class="text-center mb-6">
+                <h3 class="text-xl font-semibold">Worker Monthly</h3>
+                <p class="text-gray-500 text-sm">Standard plan</p>
+                <div class="text-3xl font-bold text-blue-600 mt-4">$9.99<span class="text-sm font-normal">/month</span></div>
+              </div>
+              <ul class="space-y-3 mb-8">
+                <li class="flex items-start">
+                  <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                  <span>Account maintenance</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                  <span>Priority in job listings</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                  <span>Customer support</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                  <span>Up to 20 job applications/month</span>
+                </li>
+              </ul>
+              <button class="w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">Select Plan</button>
+            </div>
+            
+            <div class="bg-gray-50 p-6 rounded-lg shadow-sm border-t-4 border-blue-600">
+              <div class="text-center mb-6">
+                <h3 class="text-xl font-semibold">Contractor Premium</h3>
+                <p class="text-gray-500 text-sm">Optional upgrade</p>
+                <div class="text-3xl font-bold text-blue-600 mt-4">$19.99<span class="text-sm font-normal">/month</span></div>
+              </div>
+              <ul class="space-y-3 mb-8">
+                <li class="flex items-start">
+                  <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                  <span>Featured job postings</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                  <span>Advanced worker filtering</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                  <span>Priority customer support</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                  <span>Unlimited job postings</span>
+                </li>
+              </ul>
+              <button class="w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">Select Plan</button>
+            </div>
+          </div>
+          
+          <p class="text-center text-gray-500 mt-8">Contractors can register and browse for free. Premium features available as an optional upgrade.</p>
+        </div>
+      </section>
+
+      <!-- Categorization System Section -->
+      <section id="categories" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+          <h2 class="text-3xl font-bold text-center mb-12">Categorization System</h2>
+          
+          <div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-sm mb-8">
+            <h3 class="text-xl font-semibold mb-4">How Workers Are Categorized</h3>
+            <p class="mb-6">Our system organizes workers into skill-based categories, allowing contractors to easily find the right talent for their specific needs. Categories become fully active once they have at least 5 registered workers.</p>
+            
+            <div class="bg-blue-50 border-l-4 border-blue-600 p-4 mb-6">
+              <h4 class="font-semibold">Category Activation Thresholds:</h4>
+              <ul class="list-disc pl-5 mt-2">
+                <li>Pending: 1-4 registered workers</li>
+                <li>Active: 5+ registered workers</li>
+              </ul>
+            </div>
+            
+            <h4 class="font-semibold mb-3">Benefits of Categorization:</h4>
+            <ul class="space-y-2">
+              <li class="flex items-start">
+                <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                <span>Easier discovery for contractors seeking specific skills</span>
+              </li>
+              <li class="flex items-start">
+                <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                <span>Fair competition among workers with similar skills</span>
+              </li>
+              <li class="flex items-start">
+                <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                <span>Specialized rating systems tailored to each profession</span>
+              </li>
+            </ul>
+          </div>
+          
+          <h3 class="text-xl font-semibold text-center mb-6">Sample Categories</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div class="category-card bg-white p-4 rounded-lg shadow-sm text-center">
+              <div class="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-hammer text-blue-600"></i>
+              </div>
+              <h4 class="font-medium">Carpentry</h4>
+              <p class="text-sm text-gray-500">24 Workers</p>
+            </div>
+            
+            <div class="category-card bg-white p-4 rounded-lg shadow-sm text-center">
+              <div class="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-plug text-blue-600"></i>
+              </div>
+              <h4 class="font-medium">Electricians</h4>
+              <p class="text-sm text-gray-500">18 Workers</p>
+            </div>
+            
+            <div class="category-card bg-white p-4 rounded-lg shadow-sm text-center">
+              <div class="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-paint-roller text-blue-600"></i>
+              </div>
+              <h4 class="font-medium">Painters</h4>
+              <p class="text-sm text-gray-500">15 Workers</p>
+            </div>
+            
+            <div class="category-card pending bg-white p-4 rounded-lg shadow-sm text-center tooltip">
+              <div class="bg-gray-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-seedling text-gray-600"></i>
+              </div>
+              <h4 class="font-medium">Landscaping</h4>
+              <p class="text-sm text-gray-500">3 Workers</p>
+              <span class="tooltiptext">Category pending activation (needs 5+ workers)</span>
+            </div>
+            
+            <div class="category-card bg-white p-4 rounded-lg shadow-sm text-center">
+              <div class="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-sink text-blue-600"></i>
+              </div>
+              <h4 class="font-medium">Plumbing</h4>
+              <p class="text-sm text-gray-500">12 Workers</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Rating System Section -->
+      <section id="ratings" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+          <h2 class="text-3xl font-bold text-center mb-12">Rating and Review System</h2>
+          
+          <div class="grid md:grid-cols-2 gap-12">
+            <div class="bg-gray-50 p-6 rounded-lg shadow-sm">
+              <h3 class="text-xl font-semibold mb-4">How Ratings Work</h3>
+              
+              <div class="mb-6">
+                <p class="mb-3">After job completion, contractors can rate workers based on:</p>
+                <ul class="space-y-2">
+                  <li class="flex items-start">
+                    <i class="fas fa-star text-yellow-400 mt-1 mr-3"></i>
+                    <span>Quality of work (1-5 stars)</span>
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-clock text-yellow-400 mt-1 mr-3"></i>
+                    <span>Timeliness (1-5 stars)</span>
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-comment text-yellow-400 mt-1 mr-3"></i>
+                    <span>Communication (1-5 stars)</span>
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-dollar-sign text-yellow-400 mt-1 mr-3"></i>
+                    <span>Value for money (1-5 stars)</span>
+                  </li>
+                </ul>
+              </div>
+              
+              <p class="mb-3">The overall rating is calculated as an average of these four criteria.</p>
+              <p>Workers with higher ratings appear higher in search results and category listings.</p>
+            </div>
+            
+            <div class="bg-gray-50 p-6 rounded-lg shadow-sm">
+              <h3 class="text-xl font-semibold mb-4">Impact on Recommendations</h3>
+              
+              <div class="space-y-4 mb-6">
+                <div class="flex items-center">
+                  <div class="flex items-center mr-3">
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                  </div>
+                  <span>Featured in "Top Rated" section</span>
+                </div>
+                
+                <div class="flex items-center">
+                  <div class="flex items-center mr-3">
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-gray-300"></i>
+                  </div>
+                  <span>Priority in search results</span>
+                </div>
+                
+                <div class="flex items-center">
+                  <div class="flex items-center mr-3">
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-gray-300"></i>
+                    <i class="fas fa-star text-gray-300"></i>
+                  </div>
+                  <span>Standard visibility</span>
+                </div>
+                
+                <div class="flex items-center">
+                  <div class="flex items-center mr-3">
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-gray-300"></i>
+                    <i class="fas fa-star text-gray-300"></i>
+                    <i class="fas fa-star text-gray-300"></i>
+                  </div>
+                  <span>Lower placement in listings</span>
+                </div>
+              </div>
+              
+              <p>Workers can improve their ratings by providing excellent service, addressing feedback, and maintaining high professional standards.</p>
+            </div>
+          </div>
+          
+          <div class="mt-12 bg-white p-6 rounded-lg shadow-sm border border-gray-200 max-w-3xl mx-auto">
+            <h3 class="text-xl font-semibold mb-4">Sample Worker Reviews</h3>
+            
+            <div class="border-b pb-4 mb-4">
+              <div class="flex items-center mb-2">
+                <div class="flex items-center mr-3">
+                  <i class="fas fa-star text-yellow-400"></i>
+                  <i class="fas fa-star text-yellow-400"></i>
+                  <i class="fas fa-star text-yellow-400"></i>
+                  <i class="fas fa-star text-yellow-400"></i>
+                  <i class="fas fa-star text-yellow-400"></i>
+                </div>
+                <span class="font-semibold">Excellent Work!</span>
+              </div>
+              <p class="text-gray-600">John was punctual, professional, and completed the job perfectly. Would definitely hire again for any electrical work!</p>
+              <div class="text-sm text-gray-500 mt-2">- Michael S. (Contractor)</div>
+            </div>
+            
+            <div>
+              <div class="flex items-center mb-2">
+                <div class="flex items-center mr-3">
+                  <i class="fas fa-star text-yellow-400"></i>
+                  <i class="fas fa-star text-yellow-400"></i>
+                  <i class="fas fa-star text-yellow-400"></i>
+                  <i class="fas fa-star text-yellow-400"></i>
+                  <i class="fas fa-star text-gray-300"></i>
+                </div>
+                <span class="font-semibold">Good Job Overall</span>
+              </div>
+              <p class="text-gray-600">Sarah did a great job with the painting. Took a bit longer than expected but the quality was very good.</p>
+              <div class="text-sm text-gray-500 mt-2">- Rebecca T. (Contractor)</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Registration Modal -->
+      <div id="registration-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full max-h-[90vh] overflow-y-auto">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-2xl font-bold" id="modal-title">Create an Account</h3>
+            <button id="close-modal" class="text-gray-400 hover:text-gray-600">
+              <i class="fas fa-times text-xl"></i>
+            </button>
+          </div>
+          
+          <div id="registration-content">
+            <form id="registration-form" class="space-y-4">
+              <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                <input type="email" id="email" name="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+              </div>
+              
+              <div>
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <input type="password" id="password" name="password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+              </div>
+              
+              <div>
+                <label for="confirm-password" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                <input type="password" id="confirm-password" name="confirm-password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">I am registering as:</label>
+                <div class="flex space-x-4">
+                  <div class="flex items-center">
+                    <input type="radio" id="role-contractor" name="role" value="contractor" class="mr-2" required>
+                    <label for="role-contractor">Contractor</label>
+                  </div>
+                  <div class="flex items-center">
+                    <input type="radio" id="role-worker" name="role" value="worker" class="mr-2">
+                    <label for="role-worker">Worker</label>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="flex items-start">
+                <input type="checkbox" id="terms" name="terms" class="mt-1 mr-2" required>
+                <label for="terms" class="text-sm text-gray-600">I agree to the <a href="javascript:void(0)" class="text-blue-600 hover:underline">Terms of Service</a> and <a href="javascript:void(0)" class="text-blue-600 hover:underline">Privacy Policy</a></label>
+              </div>
+              
+              <button type="submit" class="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">Create Account</button>
+            </form>
+            
+            <div class="mt-4 text-center">
+              <p class="text-sm text-gray-600">Already have an account? <a href="javascript:void(0)" class="text-blue-600 hover:underline" id="login-link">Log in</a></p>
+            </div>
+          </div>
+          
+          <div id="verification-content" class="hidden">
+            <p class="text-center mb-4">We've sent a verification email to your address. Please check your inbox and verify your email to continue.</p>
+            <div class="bg-blue-50 border-l-4 border-blue-600 p-4 text-sm">
+              <p class="font-medium">Important:</p>
+              <p>Your account will remain inactive until you verify your email address.</p>
+            </div>
+            <button id="resend-verification" class="w-full py-2 px-4 mt-6 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition">Resend Verification Email</button>
+          </div>
+          
+          <div id="worker-application" class="hidden">
+            <div class="step-indicator mb-6">
+              <div class="step active" id="step-1">Personal Info</div>
+              <div class="step" id="step-2">Documentation</div>
+              <div class="step" id="step-3">Review</div>
+            </div>
+            
+            <div id="step-1-content">
+              <form id="personal-info-form" class="space-y-4">
+                <div>
+                  <label for="full-name" class="block text-sm font-medium text-gray-700 mb-1">Full Legal Name</label>
+                  <input type="text" id="full-name" name="full-name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                
+                <div>
+                  <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
+                  <input type="tel" id="phone" name="phone" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                
+                <div>
+                  <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                  <textarea id="address" name="address" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required></textarea>
+                </div>
+                
+                <div>
+                  <label for="occupation" class="block text-sm font-medium text-gray-700 mb-1">Primary Occupation</label>
+                  <select id="occupation" name="occupation" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    <option value="">Select an occupation</option>
+                    <option value="carpenter">Carpenter</option>
+                    <option value="electrician">Electrician</option>
+                    <option value="plumber">Plumber</option>
+                    <option value="painter">Painter</option>
+                    <option value="landscaper">Landscaper</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                
+                <button type="button" id="step-1-next" class="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">Continue</button>
+              </form>
+            </div>
+            
+            <div id="step-2-content" class="hidden">
+              <form id="documentation-form" class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Government-issued ID</label>
+                  <div class="border-2 border-dashed border-gray-300 rounded-md p-4 text-center">
+                    <i class="fas fa-id-card text-gray-400 text-3xl mb-2"></i>
+                    <p class="text-sm text-gray-500 mb-2">Upload a scanned copy or clear photo</p>
+                    <input type="file" id="id-upload" name="id-upload" class="hidden" accept="image/*,.pdf">
+                    <button type="button" id="id-upload-btn" class="py-1 px-4 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition">Select File</button>
+                    <p id="id-file-name" class="text-sm text-gray-600 mt-2"></p>
+                  </div>
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Proof of Work (Portfolio/Certificates)</label>
+                  <div class="border-2 border-dashed border-gray-300 rounded-md p-4 text-center">
+                    <i class="fas fa-file-alt text-gray-400 text-3xl mb-2"></i>
+                    <p class="text-sm text-gray-500 mb-2">Upload certificates or work samples</p>
+                    <input type="file" id="work-upload" name="work-upload" class="hidden" accept="image/*,.pdf" multiple>
+                    <button type="button" id="work-upload-btn" class="py-1 px-4 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition">Select Files</button>
+                    <p id="work-file-name" class="text-sm text-gray-600 mt-2"></p>
+                  </div>
+                </div>
+                
+                <div>
+                  <label for="portfolio-url" class="block text-sm font-medium text-gray-700 mb-1">Portfolio URL (Optional)</label>
+                  <input type="url" id="portfolio-url" name="portfolio-url" placeholder="https://your-portfolio-site.com" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <div class="flex space-x-4">
+                  <button type="button" id="step-2-prev" class="w-1/2 py-2 px-4 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition">Back</button>
+                  <button type="button" id="step-2-next" class="w-1/2 py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">Continue</button>
+                </div>
+              </form>
+            </div>
+            
+            <div id="step-3-content" class="hidden">
+              <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                <h4 class="font-semibold mb-2">Application Summary</h4>
+                <div class="space-y-2 text-sm">
+                  <p><span class="font-medium">Name:</span> <span id="summary-name">John Doe</span></p>
+                  <p><span class="font-medium">Contact:</span> <span id="summary-phone">(555) 123-4567</span></p>
+                  <p><span class="font-medium">Occupation:</span> <span id="summary-occupation">Carpenter</span></p>
+                  <p><span class="font-medium">Documents:</span> <span id="summary-docs">2 files uploaded</span></p>
+                </div>
+              </div>
+              
+              <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                <div class="flex">
+                  <i class="fas fa-exclamation-circle text-yellow-400 mt-1 mr-3"></i>
+                  <div>
+                    <p class="font-medium">Before submitting your application:</p>
+                    <ul class="list-disc pl-5 text-sm mt-2">
+                      <li>Ensure all information is accurate and complete</li>
+                      <li>Verify that your documents are clearly visible</li>
+                      <li>Review the application fee and monthly subscription details</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="flex space-x-4">
+                <button type="button" id="step-3-prev" class="w-1/2 py-2 px-4 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition">Back</button>
+                <button type="button" id="submit-application" class="w-1/2 py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">Submit Application</button>
+              </div>
+            </div>
+          </div>
+          
+          <div id="application-submitted" class="hidden text-center">
+            <i class="fas fa-check-circle text-green-500 text-5xl mb-4"></i>
+            <h3 class="text-xl font-semibold mb-2">Application Submitted!</h3>
+            <p class="mb-6">Your worker application has been received and is now under review. This process typically takes 1-2 business days.</p>
+            <p class="text-sm text-gray-600 mb-4">We'll send you an email once your application has been approved.</p>
+            <button id="go-to-payment" class="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">Proceed to Payment</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-10">
+      <div class="container mx-auto px-4">
+        <div class="grid md:grid-cols-4 gap-8">
+          <div>
+            <h3 class="text-lg font-semibold mb-4">LocalJobs Connect</h3>
+            <p class="text-gray-300 text-sm">Connecting local talent with opportunities in your community since 2025.</p>
+            <div class="flex space-x-4 mt-4">
+              <a href="javascript:void(0)" class="text-gray-300 hover:text-white">
+                <i class="fab fa-facebook-f"></i>
+              </a>
+              <a href="javascript:void(0)" class="text-gray-300 hover:text-white">
+                <i class="fab fa-twitter"></i>
+              </a>
+              <a href="javascript:void(0)" class="text-gray-300 hover:text-white">
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a href="javascript:void(0)" class="text-gray-300 hover:text-white">
+                <i class="fab fa-linkedin-in"></i>
+              </a>
+            </div>
+          </div>
+          
+          <div>
+            <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+            <ul class="space-y-2 text-sm">
+              <li><a href="javascript:void(0)" class="text-gray-300 hover:text-white">Home</a></li>
+              <li><a href="javascript:void(0)" class="text-gray-300 hover:text-white">About Us</a></li>
+              <li><a href="javascript:void(0)" class="text-gray-300 hover:text-white">How It Works</a></li>
+              <li><a href="javascript:void(0)" class="text-gray-300 hover:text-white">Categories</a></li>
+              <li><a href="javascript:void(0)" class="text-gray-300 hover:text-white">Pricing</a></li>
+            </ul>
+          </div>
+          
+          <div>
+            <h3 class="text-lg font-semibold mb-4">Resources</h3>
+            <ul class="space-y-2 text-sm">
+              <li><a href="javascript:void(0)" class="text-gray-300 hover:text-white">FAQ</a></li>
+              <li><a href="javascript:void(0)" class="text-gray-300 hover:text-white">Support Center</a></li>
+              <li><a href="javascript:void(0)" class="text-gray-300 hover:text-white">Terms of Service</a></li>
+              <li><a href="javascript:void(0)" class="text-gray-300 hover:text-white">Privacy Policy</a></li>
+              <li><a href="javascript:void(0)" class="text-gray-300 hover:text-white">Blog</a></li>
+            </ul>
+          </div>
+          
+          <div>
+            <h3 class="text-lg font-semibold mb-4">Contact Us</h3>
+            <ul class="space-y-2 text-sm">
+              <li class="flex items-start">
+                <i class="fas fa-map-marker-alt mt-1 mr-3 text-gray-400"></i>
+                <span class="text-gray-300">123 Main Street, Anytown, USA 12345</span>
+              </li>
+              <li class="flex items-start">
+                <i class="fas fa-phone mt-1 mr-3 text-gray-400"></i>
+                <span class="text-gray-300">(555) 123-4567</span>
+              </li>
+              <li class="flex items-start">
+                <i class="fas fa-envelope mt-1 mr-3 text-gray-400"></i>
+                <span class="text-gray-300">support@localjobsconnect.com</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="border-t border-gray-700 mt-8 pt-8 text-center text-sm text-gray-400">
+          <p>&copy; 2025 LocalJobs Connect. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <script id="app-script">
+      $(document).ready(function() {
+        // Modal functionality
+        $("#register-btn, #contractor-btn, #worker-btn").on("click", function() {
+          $("#registration-modal").removeClass("hidden");
+          
+          if ($(this).attr("id") === "contractor-btn") {
+            $("#role-contractor").prop("checked", true);
+          } else if ($(this).attr("id") === "worker-btn") {
+            $("#role-worker").prop("checked", true);
+          }
+        });
+        
+        $("#close-modal").on("click", function() {
+          $("#registration-modal").addClass("hidden");
+          resetModal();
+        });
+        
+        // Form submission
+        $("#registration-form").on("submit", function(e) {
+          e.preventDefault();
+          
+          // Simulate form validation
+          const email = $("#email").val();
+          const password = $("#password").val();
+          const confirmPassword = $("#confirm-password").val();
+          const role = $("input[name='role']:checked").val();
+          
+          if (!email || !password || !confirmPassword || !role) {
+            alert("Please fill in all required fields.");
+            return;
+          }
+          
+          if (password !== confirmPassword) {
+            alert("Passwords do not match.");
+            return;
+          }
+          
+          // Show verification screen
+          $("#registration-content").addClass("hidden");
+          $("#verification-content").removeClass("hidden");
+          
+          // Simulate email verification (for demo purposes only)
+          setTimeout(function() {
+            $("#verification-content").addClass("hidden");
+            
+            if (role === "worker") {
+              $("#worker-application").removeClass("hidden");
+            } else {
+              // For contractors, we would normally show their dashboard
+              $("#application-submitted").removeClass("hidden");
+            }
+          }, 2000);
+        });
+        
+        // Worker application steps
+        $("#step-1-next").on("click", function() {
+          if (validateStep1()) {
+            $("#step-1-content").addClass("hidden");
+            $("#step-2-content").removeClass("hidden");
+            $("#step-1").addClass("completed").removeClass("active");
+            $("#step-2").addClass("active");
+          }
+        });
+        
+        $("#step-2-prev").on("click", function() {
+          $("#step-2-content").addClass("hidden");
+          $("#step-1-content").removeClass("hidden");
+          $("#step-2").removeClass("active");
+          $("#step-1").removeClass("completed").addClass("active");
+        });
+        
+        $("#step-2-next").on("click", function() {
+          if (validateStep2()) {
+            $("#step-2-content").addClass("hidden");
+            $("#step-3-content").removeClass("hidden");
+            $("#step-2").addClass("completed").removeClass("active");
+            $("#step-3").addClass("active");
+            
+            // Update summary
+            $("#summary-name").text($("#full-name").val());
+            $("#summary-phone").text($("#phone").val());
+            $("#summary-occupation").text($("#occupation option:selected").text());
+            
+            let docsCount = 0;
+            if ($("#id-file-name").text()) docsCount++;
+            if ($("#work-file-name").text()) docsCount++;
+            $("#summary-docs").text(`${docsCount} files uploaded`);
+          }
+        });
+        
+        $("#step-3-prev").on("click", function() {
+          $("#step-3-content").addClass("hidden");
+          $("#step-2-content").removeClass("hidden");
+          $("#step-3").removeClass("active");
+          $("#step-2").removeClass("completed").addClass("active");
+        });
+        
+        $("#submit-application").on("click", function() {
+          $("#worker-application").addClass("hidden");
+          $("#application-submitted").removeClass("hidden");
+        });
+        
+        // File upload handlers
+        $("#id-upload-btn").on("click", function() {
+          $("#id-upload").click();
+        });
+        
+        $("#id-upload").on("change", function() {
+          if (this.files.length > 0) {
+            $("#id-file-name").text(this.files[0].name);
+          }
+        });
+        
+        $("#work-upload-btn").on("click", function() {
+          $("#work-upload").click();
+        });
+        
+        $("#work-upload").on("change", function() {
+          if (this.files.length > 0) {
+            let fileNames = Array.from(this.files).map(file => file.name).join(", ");
+            $("#work-file-name").text(fileNames);
+          }
+        });
+        
+        // Validation functions
+        function validateStep1() {
+          const fullName = $("#full-name").val();
+          const phone = $("#phone").val();
+          const address = $("#address").val();
+          const occupation = $("#occupation").val();
+          
+          if (!fullName || !phone || !address || !occupation) {
+            alert("Please fill in all required fields.");
+            return false;
+          }
+          
+          return true;
+        }
+        
+        function validateStep2() {
+          const idFile = $("#id-file-name").text();
+          
+          if (!idFile) {
+            alert("Please upload your government-issued ID.");
+            return false;
+          }
+          
+          return true;
+        }
+        
+        // Reset modal to initial state
+        function resetModal() {
+          $("#registration-form")[0].reset();
+          $("#personal-info-form")[0].reset();
+          $("#documentation-form")[0].reset();
+          
+          $("#registration-content").removeClass("hidden");
+          $("#verification-content, #worker-application, #application-submitted").addClass("hidden");
+          
+          $("#step-1-content").removeClass("hidden");
+          $("#step-2-content, #step-3-content").addClass("hidden");
+          
+          $("#step-1").addClass("active").removeClass("completed");
+          $("#step-2, #step-3").removeClass("active completed");
+          
+          $("#id-file-name, #work-file-name").text("");
+        }
+        
+        // Payment button
+        $("#go-to-payment").on("click", function() {
+          // In a real application, this would redirect to a payment page
+          alert("This is a prototype. In the full version, you would be redirected to a payment page.");
+        });
+      });
+    </script>
+  </body>
+</html>
+
+CODIGO APP
